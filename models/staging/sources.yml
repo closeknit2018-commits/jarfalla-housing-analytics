@@ -13,5 +13,4 @@ sources:
       - name: scb_deso_population
         description: "Raw population observations by DeSO area, age and gender."
 
-      - name: regso_areas
-        description: "SCB RegSO geographic areas and boundary geometry."
+

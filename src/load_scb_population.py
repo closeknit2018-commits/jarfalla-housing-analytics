@@ -35,32 +35,27 @@ EXPECTED_COUNTS = {
 # --------------------------------------------------
 # Database connection
 # --------------------------------------------------
-
-def get_connection():
-    required_variables = [
-        "DBT_HOST",
-        "DBT_PORT",
-        "DBT_USER",
-        "DBT_ENV_SECRET_PASSWORD",
-        "DBT_DATABASE",
-    ]
-
-    missing = [
-        name for name in required_variables
-        if not os.getenv(name)
-    ]
-
-    if missing:
-        raise ValueError(f"Missing database environment variables: {missing}")
-
-    return psycopg.connect(
-        host=os.getenv("DBT_HOST"),
-        port=os.getenv("DBT_PORT"),
-        user=os.getenv("DBT_USER"),
-        password=os.getenv("DBT_ENV_SECRET_PASSWORD"),
-        dbname=os.getenv("DBT_DATABASE"),
-    )
-
+def get_connection(target="local"):
+    if target == "local":
+        return psycopg.connect(
+            host=os.getenv("DBT_HOST"),
+            port=os.getenv("DBT_PORT"),
+            user=os.getenv("DBT_USER"),
+            password=os.getenv("DBT_ENV_SECRET_PASSWORD"),
+            dbname=os.getenv("DBT_DATABASE"),
+        )
+    elif target == "neon":
+        return psycopg.connect(
+            host=os.getenv("NEON_DB_HOST"),
+            port=os.getenv("NEON_DB_PORT"),
+            user=os.getenv("NEON_DB_USER"),
+            password=os.getenv("NEON_DB_PASSWORD"),
+            dbname=os.getenv("NEON_DB_DATABASE"),
+            sslmode="require",
+        )
+    else:
+        raise ValueError("Invalid database target. Choose 'local' or 'neon'."
+        )
 
 # --------------------------------------------------
 # JSON-stat2 helpers
@@ -355,10 +350,10 @@ def validate_database(cursor):
 # Main
 # --------------------------------------------------
 
-def main():
-    print("Starting SCB population data loading...")
+def main(target="local"):
+    print(f"Starting SCB population data loading to {target}...")
 
-    with get_connection() as connection:
+    with get_connection(target) as connection:
         with connection.cursor() as cursor:
 
             for file_name in FILES["municipality"]:
@@ -372,5 +367,19 @@ def main():
     print("\nSCB population data loading completed successfully.")
 
 
+def test_neon_connection():
+    print("Testing Neon connection...")
+
+    with get_connection("neon") as connection:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT current_database(), current_user;")
+            result = cursor.fetchone()
+
+            print(f"Database: {result[0]}")
+            print(f"User: {result[1]}")
+
+    print("Neon connection successful!")
+
+
 if __name__ == "__main__":
-    main()
+   main("neon")
