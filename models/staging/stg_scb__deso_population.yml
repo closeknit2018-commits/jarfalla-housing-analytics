@@ -1,0 +1,33 @@
+
+version: 2
+
+models:
+  - name: stg_scb__deso_population
+    description: "Standardized SCB population data by DeSO area."
+
+    columns:
+      - name: population_id
+        data_tests:
+          - unique
+          - not_null
+
+      - name: geography_version
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - DeSO2018
+                  - DeSO2025
+
+      - name: region_code
+        data_tests:
+          - not_null
+
+      - name: reference_year
+        data_tests:
+          - not_null
+
+      - name: population
+        data_tests:
+          - not_null

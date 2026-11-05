@@ -1,0 +1,39 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+profiles.yml
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+
+# dbt generated files
+target/
+dbt_packages/
+logs/
+
+# Local data
+data/
+*.csv
+*.parquet
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Editor and operating system
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Logs
+*.log
+
+# Local user metadata
+.user.yml
